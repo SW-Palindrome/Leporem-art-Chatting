@@ -1,0 +1,21 @@
+[tool.poetry]
+name = "leporem-art-chatting"
+version = "0.1.0"
+description = ""
+authors = ["jshong0907 <jshong0907@gmail.com>"]
+readme = "README.md"
+packages = [{include = "leporem_art_chatting", from = "src"}]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+python-socketio = "^5.8.0"
+uvicorn = "^0.23.1"
+websockets = "^11.0.3"
+
+[tool.poetry.scripts]
+run-server = 'leporem_art_chatting.server:run_server'
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
