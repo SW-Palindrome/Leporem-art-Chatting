@@ -45,12 +45,16 @@ async def send_message(sid, data):
     send_data = {
         'message': data['message'],
         'chat_room_id': data['chat_room_id'],
-     }
-    await asyncio.gather(
-        sio.emit('receive_message', send_data, room=data['opponent_user_id']),
-        _migrate_message(sid, data),
-    )
-    logger.info(f'send_message {data}')
+    }
+    try:
+        await _migrate_message(sid, data),
+    except Exception as e:
+        logger.error(e)
+    else:
+        await asyncio.gather(
+            sio.emit('receive_message', send_data, room=data['opponent_user_id']),
+            sio.emit('message_registered', {'message_id': data['message_id']}, room=data['user_id']),
+        )
 
 
 async def _migrate_message(sid, data):
@@ -66,6 +70,8 @@ async def _migrate_message(sid, data):
         response = requests.post(MESSAGE_UPLOAD_URL, data=send_data, headers=headers)
         if not response.status_code == 201:
             logger.error(response.status_code, response.text)
+        else:
+            raise Exception(f'message upload failed with {response.text}')
 
 
 @sio.event
