@@ -46,6 +46,10 @@ async def send_message(sid, data):
         'message': data['message'],
         'chat_room_id': data['chat_room_id'],
     }
+    registered_data = {
+        'message_id': data['message_id'],
+        'chat_room_id': data['chat_room_id'],
+    }
     try:
         await _migrate_message(sid, data),
     except Exception as e:
@@ -53,7 +57,7 @@ async def send_message(sid, data):
     else:
         await asyncio.gather(
             sio.emit('receive_message', send_data, room=data['opponent_user_id']),
-            sio.emit('message_registered', {'message_id': data['message_id']}, room=data['user_id']),
+            sio.emit('message_registered', registered_data, room=data['user_id']),
         )
 
 
