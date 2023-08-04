@@ -59,9 +59,7 @@ async def _migrate_message(sid, data):
         }
 
         response = requests.post(MESSAGE_UPLOAD_URL, data=send_data, headers=headers)
-        if not response.status_code == 201:
-            logger.error(response.status_code, response.text)
-        else:
+        if response.status_code != 201:
             raise Exception(f'message upload failed with {response.text}')
 
         await asyncio.gather(
