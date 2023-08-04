@@ -67,7 +67,7 @@ async def _migrate_message(sid, data):
             }, room=session['user_id']),
             sio.emit('receive_message', {
                 'chat_room_id': data['chat_room_id'],
-                'text': data['message'],
+                'message': data['message'],
                 'message_id': response.json()['message_id'],
             }, room=data['opponent_user_id']),
         )
