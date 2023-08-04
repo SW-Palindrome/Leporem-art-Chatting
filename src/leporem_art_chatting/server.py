@@ -42,10 +42,7 @@ async def _validate_session_login(sid):
 @sio.event
 async def send_message(sid, data):
     await _validate_session_login(sid)
-    try:
-        await _migrate_message(sid, data),
-    except Exception as e:
-        logger.error(e)
+    await _migrate_message(sid, data)
 
 
 async def _migrate_message(sid, data):
@@ -63,12 +60,12 @@ async def _migrate_message(sid, data):
             raise Exception(f'message upload failed with {response.text}')
 
         await asyncio.gather(
-            await sio.emit('message_registered', {
+            sio.emit('message_registered', {
                 'message_temp_id': data['message_id'],
                 'chat_room_id': data['chat_room_id'],
                 'message_id': response.json()['message_id'],
-            }, room=data['user_id']),
-            await sio.emit('receive_message', {
+            }, room=session['user_id']),
+            sio.emit('receive_message', {
                 'chat_room_id': data['chat_room_id'],
                 'text': data['message'],
                 'message_id': response.json()['message_id'],
