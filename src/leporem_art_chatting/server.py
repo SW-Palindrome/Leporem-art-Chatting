@@ -51,7 +51,7 @@ async def _migrate_message(sid, data):
             'Authorization': f'Palindrome {session["id_token"]}',
         }
         send_data = {
-            'chat_room_id': data['chat_room_id'],
+            'chat_room_uuid': data['chat_room_uuid'],
             'text': data['message'],
         }
 
@@ -61,14 +61,13 @@ async def _migrate_message(sid, data):
 
         await asyncio.gather(
             sio.emit('message_registered', {
-                'message_temp_id': data['message_id'],
-                'chat_room_id': data['chat_room_id'],
-                'message_id': response.json()['message_id'],
+                'message_uuid': data['message_uuid'],
+                'chat_room_uuid': data['chat_room_uuid'],
             }, room=session['user_id']),
             sio.emit('receive_message', {
-                'chat_room_id': data['chat_room_id'],
+                'chat_room_uuid': data['chat_room_uuid'],
                 'message': data['message'],
-                'message_id': response.json()['message_id'],
+                'message_uuid': data['message_uuid'],
             }, room=data['opponent_user_id']),
         )
 
