@@ -53,6 +53,7 @@ async def _migrate_message(sid, data):
         send_data = {
             'chat_room_uuid': data['chat_room_uuid'],
             'text': data['message'],
+            'message_uuid': data['message_uuid'],
         }
 
         response = requests.post(MESSAGE_UPLOAD_URL, data=send_data, headers=headers)
