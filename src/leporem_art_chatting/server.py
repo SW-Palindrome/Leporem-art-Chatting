@@ -4,7 +4,7 @@ import logging
 import requests
 import socketio
 
-from leporem_art_chatting.settings import LOGIN_URL, MESSAGE_UPLOAD_URL
+from leporem_art_chatting.settings import LOGIN_URL, MESSAGE_UPLOAD_URL, CHATROOM_CREATE_BY_BUYER_URL
 
 logger = logging.getLogger(__name__)
 sio = socketio.AsyncServer(async_mode='asgi')
@@ -70,6 +70,41 @@ async def _migrate_message(sid, data):
                 'message': data['message'],
                 'message_uuid': data['message_uuid'],
             }, room=data['opponent_user_id']),
+        )
+
+
+@sio.event
+async def create_chat_room(sid, data):
+    await _validate_session_login(sid)
+    await _migrate_chat_room(sid, data)
+
+
+async def _migrate_chat_room(sid, data):
+    async with sio.session(sid) as session:
+        headers = {
+            'Authorization': f'Palindrome {session["id_token"]}',
+        }
+        send_data = {
+            'chat_room_uuid': data['chat_room_uuid'],
+            'seller_id': data['seller_id'],
+            'text': data['message'],
+            'message_uuid': data['message_uuid'],
+        }
+
+        response = requests.post(
+            CHATROOM_CREATE_BY_BUYER_URL,
+            data=send_data,
+            headers=headers
+        )
+        if response.status_code != 201:
+            raise Exception(f'chatroom create failed with {response.text}')
+
+        await asyncio.gather(
+            sio.emit('chat_room_registered', {
+                'chat_room_uuid': data['chat_room_uuid'],
+            }, room=session['user_id']),
+            # TODO: 채팅방 생성 시 정보 전달
+            sio.emit('receive_chat_room_create', {}, room=data['opponent_user_id']),
         )
 
 
