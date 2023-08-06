@@ -90,6 +90,7 @@ async def _migrate_chat_room(sid, data):
             'seller_id': data['seller_id'],
             'text': data['message'],
             'message_uuid': data['message_uuid'],
+            'message_type': data.get('message_type', 'TEXT')
         }
 
         response = requests.post(
