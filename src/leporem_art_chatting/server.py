@@ -70,6 +70,7 @@ async def _migrate_message(sid, data):
                 'chat_room_uuid': data['chat_room_uuid'],
                 'message': data['message'],
                 'message_uuid': data['message_uuid'],
+                'message_type': data.get('message_type', 'TEXT'),
             }, room=data['opponent_user_id']),
         )
 
