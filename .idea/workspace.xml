@@ -4,8 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="25f943a0-e393-455b-8055-e47828ee3d96" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/src/leporem_art_chatting/server.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/leporem_art_chatting/server.py" afterDir="false" />
+    <list default="true" id="8d58a3c0-4ad8-434d-86c4-17493be23606" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/leporem_art_chatting/settings/production.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/leporem_art_chatting/settings/production.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -25,58 +26,42 @@
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
   </component>
-  <component name="ProjectId" id="2TKPvgBDLuQjxswstPcKaYWO3V1" />
+  <component name="ProjectId" id="2TmaAO6Zvo1a1Mdyr0o0ZYEZwVI" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
-    &quot;last_opened_file_path&quot;: &quot;/Users/joonshik/Develop/Project/palindrome/Leporem-art-Chatting&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "WebServerToolWindowFactoryState": "false",
+    "node.js.detected.package.eslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "vue.rearranger.settings.migration": "true"
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
-      <recent name="$PROJECT_DIR$/src/leporem_art_chatting" />
+      <recent name="$PROJECT_DIR$/src/leporem_art_chatting/settings" />
     </key>
   </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
-      <changelist id="25f943a0-e393-455b-8055-e47828ee3d96" name="Changes" comment="" />
-      <created>1690789030692</created>
+      <changelist id="8d58a3c0-4ad8-434d-86c4-17493be23606" name="Changes" comment="" />
+      <created>1691650566753</created>
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
-      <updated>1690789030692</updated>
-      <workItem from="1690789032436" duration="3043000" />
-      <workItem from="1690792449265" duration="39192000" />
-      <workItem from="1691073862003" duration="3975000" />
-      <workItem from="1691247578392" duration="5429000" />
+      <updated>1691650566753</updated>
+      <workItem from="1691650567995" duration="2218000" />
     </task>
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
-  </component>
-  <component name="Vcs.Log.Tabs.Properties">
-    <option name="TAB_STATES">
-      <map>
-        <entry key="MAIN">
-          <value>
-            <State />
-          </value>
-        </entry>
-      </map>
-    </option>
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Leporem_art_Chatting$health_check.coverage" NAME="health_check Coverage Results" MODIFIED="1690885714293" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/src/leporem_art_chatting" />
