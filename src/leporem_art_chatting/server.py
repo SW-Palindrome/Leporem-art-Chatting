@@ -56,6 +56,7 @@ async def _migrate_message(sid, data):
             'message_uuid': data['message_uuid'],
             'type': data.get('message_type', 'TEXT'),
         }
+        print(send_data)
 
         response = requests.post(MESSAGE_UPLOAD_URL, data=send_data, headers=headers)
         if response.status_code != 201:
@@ -93,6 +94,7 @@ async def _migrate_chat_room(sid, data):
             'message_uuid': data['message_uuid'],
             'message_type': data.get('message_type', 'TEXT')
         }
+        print(send_data)
 
         response = requests.post(
             CHATROOM_CREATE_BY_BUYER_URL,
