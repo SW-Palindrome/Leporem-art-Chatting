@@ -56,7 +56,6 @@ async def _migrate_message(sid, data):
             'message_uuid': data['message_uuid'],
             'type': data.get('message_type', 'TEXT'),
         }
-        print(send_data)
 
         response = requests.post(MESSAGE_UPLOAD_URL, data=send_data, headers=headers)
         if response.status_code != 201:
@@ -67,13 +66,19 @@ async def _migrate_message(sid, data):
                 'message_uuid': data['message_uuid'],
                 'chat_room_uuid': data['chat_room_uuid'],
             }, room=session['user_id']),
-            sio.emit('receive_message', {
+            _send_receive_message(sid, data),
+        )
+
+
+async def _send_receive_message(sid, data):
+    async with sio.session(sid) as session:
+        if session['user_id'] != data['opponent_user_id']:
+            await sio.emit('receive_message', {
                 'chat_room_uuid': data['chat_room_uuid'],
                 'message': data['message'],
                 'message_uuid': data['message_uuid'],
                 'message_type': data.get('message_type', 'TEXT'),
-            }, room=data['opponent_user_id']),
-        )
+            }, room=data['opponent_user_id'])
 
 
 @sio.event
@@ -109,8 +114,14 @@ async def _migrate_chat_room(sid, data):
                 'chat_room_uuid': data['chat_room_uuid'],
             }, room=session['user_id']),
             # TODO: 채팅방 생성 시 정보 전달
-            sio.emit('receive_chat_room_create', {}, room=data['opponent_user_id']),
+            _send_receive_chat_room(sid, data),
         )
+
+
+async def _send_receive_chat_room(sid, data):
+    async with sio.session(sid) as session:
+        if session['user_id'] != data['opponent_user_id']:
+            await sio.emit('receive_chat_room_create', {}, room=data['opponent_user_id'])
 
 
 @sio.event
