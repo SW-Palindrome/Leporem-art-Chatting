@@ -18,7 +18,7 @@ async def connect(sid, environ):
 
 @sio.event
 async def authenticate(sid, data):
-    response = requests.post(LOGIN_URL, data={'id_token': data['id_token']})
+    response = requests.post(LOGIN_URL, headers={'Authorization': f'Bearer {data["access_token"]}'})
     if not response.status_code == 200:
         await sio.disconnect(sid)
         return
@@ -28,7 +28,7 @@ async def authenticate(sid, data):
 
     async with sio.session(sid) as session:
         session['is_authenticated'] = True
-        session['id_token'] = data['id_token']
+        session['access_token'] = data['access_token']
         session['user_id'] = user_id
         sio.enter_room(sid, user_id)
 
@@ -48,7 +48,7 @@ async def send_message(sid, data):
 async def _migrate_message(sid, data):
     async with sio.session(sid) as session:
         headers = {
-            'Authorization': f'Palindrome {session["id_token"]}',
+            'Authorization': f'Bearer {session["access_token"]}',
         }
         send_data = {
             'chat_room_uuid': data['chat_room_uuid'],
@@ -90,7 +90,7 @@ async def create_chat_room(sid, data):
 async def _migrate_chat_room(sid, data):
     async with sio.session(sid) as session:
         headers = {
-            'Authorization': f'Palindrome {session["id_token"]}',
+            'Authorization': f'Bearer {session["access_token"]}',
         }
         send_data = {
             'chat_room_uuid': data['chat_room_uuid'],
