@@ -18,7 +18,7 @@ async def connect(sid, environ):
 
 @sio.event
 async def authenticate(sid, data):
-    response = requests.post(LOGIN_URL, headers={'Authorization': f'Bearer {data["access_token"]}'})
+    response = requests.get(LOGIN_URL, headers={'Authorization': f'Bearer {data["access_token"]}'})
     if not response.status_code == 200:
         await sio.disconnect(sid)
         return
