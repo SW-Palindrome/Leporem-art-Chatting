@@ -6,9 +6,12 @@ import socketio
 
 from leporem_art_chatting.settings import LOGIN_URL, MESSAGE_UPLOAD_URL, CHATROOM_CREATE_BY_BUYER_URL
 
+
 logger = logging.getLogger(__name__)
 sio = socketio.AsyncServer(async_mode='asgi')
-app = socketio.ASGIApp(sio)
+app = socketio.ASGIApp(sio, static_files={
+    '/': './public/index.html',
+})
 
 
 @sio.event
