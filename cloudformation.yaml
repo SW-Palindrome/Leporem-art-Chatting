@@ -1,0 +1,88 @@
+AWSTemplateFormatVersion: 2010-09-09
+Resources:
+  ChattingCluster:
+    Type: AWS::ECS::Cluster
+    Properties:
+      ClusterName: ChattingApp
+
+  ChattingTaskDefinition:
+    Type: AWS::ECS::TaskDefinition
+    Properties:
+      ContainerDefinitions:
+        - Name: ChattingTask
+          Essential: true
+          Image: 022129665671.dkr.ecr.ap-northeast-2.amazonaws.com/leporem-art-socket
+          PortMappings:
+            - ContainerPort: 80
+              HostPort: 80
+          LogConfiguration:
+            LogDriver: awslogs
+            Options:
+              awslogs-group: /ecs/chatting-task
+              awslogs-region: ap-northeast-2
+              awslogs-stream-prefix: ecs
+          Environment:
+            - Name: ENV
+              Value: prod
+
+      ExecutionRoleArn: arn:aws:iam::022129665671:role/ecsTaskExecutionRole
+      RequiresCompatibilities:
+        - FARGATE
+      RuntimePlatform:
+        CpuArchitecture: ARM64
+      NetworkMode: awsvpc
+      Cpu: '512'
+      Memory: '1024'
+
+  ChattingLoadBalancer:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties:
+      Type: application
+      Name: alb-chatting-server
+      SecurityGroups:
+        - sg-06f81fbe672d8d228
+      Subnets:
+        - subnet-035df05ef63fc1027
+        - subnet-0bdae204e69666160
+
+  ChattingTargetGroup:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      HealthCheckPath: /
+      Name: tg-chatting-server
+      Port: 80
+      Protocol: HTTP
+      TargetType: ip
+      VpcId: vpc-060aae09116cec874
+
+  ChattingListener:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Properties:
+      DefaultActions:
+        - Type: forward
+          TargetGroupArn: !Ref ChattingTargetGroup
+      LoadBalancerArn: !Ref ChattingLoadBalancer
+      Port: 80
+      Protocol: HTTP
+
+  ChattingService:
+    Type: AWS::ECS::Service
+    Properties:
+      ServiceName: chatting-service
+      Cluster: !Ref ChattingCluster
+      DesiredCount: 2
+      LaunchType: FARGATE
+      NetworkConfiguration:
+        AwsvpcConfiguration:
+          AssignPublicIp: ENABLED
+          SecurityGroups:
+            - sg-0cb0dd5e30baec000
+          Subnets:
+            - subnet-035df05ef63fc1027
+            - subnet-0bdae204e69666160
+      TaskDefinition: !Ref ChattingTaskDefinition
+      LoadBalancers:
+        - TargetGroupArn: !Ref ChattingTargetGroup
+          ContainerPort: 80
+          ContainerName: ChattingTask
+    DependsOn: ChattingListener
