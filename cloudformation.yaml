@@ -24,12 +24,36 @@ Resources:
           Environment:
             - Name: ENV
               Value: prod
-
+            - Name: REDIS_URL
+              Value: redis://chatting-redis.leporem-art.local:6379
       ExecutionRoleArn: arn:aws:iam::022129665671:role/ecsTaskExecutionRole
       RequiresCompatibilities:
         - FARGATE
       RuntimePlatform:
         CpuArchitecture: ARM64
+      NetworkMode: awsvpc
+      Cpu: '512'
+      Memory: '1024'
+
+  ChattingRedisTaskDefinition:
+    Type: AWS::ECS::TaskDefinition
+    Properties:
+      ContainerDefinitions:
+        - Name: RedisTask
+          Essential: true
+          Image: redis:7.2.0
+          PortMappings:
+            - ContainerPort: 6379
+              HostPort: 6379
+          LogConfiguration:
+            LogDriver: awslogs
+            Options:
+              awslogs-group: /ecs/chatting-redis
+              awslogs-region: ap-northeast-2
+              awslogs-stream-prefix: ecs
+      ExecutionRoleArn: arn:aws:iam::022129665671:role/ecsTaskExecutionRole
+      RequiresCompatibilities:
+        - FARGATE
       NetworkMode: awsvpc
       Cpu: '512'
       Memory: '1024'
@@ -40,7 +64,7 @@ Resources:
       Type: application
       Name: alb-chatting-server
       SecurityGroups:
-        - sg-06f81fbe672d8d228
+        - sg-0cb0dd5e30baec000
       Subnets:
         - subnet-035df05ef63fc1027
         - subnet-0bdae204e69666160
@@ -85,4 +109,43 @@ Resources:
         - TargetGroupArn: !Ref ChattingTargetGroup
           ContainerPort: 80
           ContainerName: ChattingTask
-    DependsOn: ChattingListener
+    DependsOn:
+      - ChattingListener
+      - RedisService
+
+  PrivateRedisDnsNamespace:
+    Type: AWS::ServiceDiscovery::PrivateDnsNamespace
+    Properties:
+      Name: leporem-art.local
+      Vpc: vpc-060aae09116cec874
+
+  RedisDiscoveryService:
+    Type: AWS::ServiceDiscovery::Service
+    Properties:
+      Description: Redis Discovery Service
+      DnsConfig:
+        RoutingPolicy: MULTIVALUE
+        DnsRecords:
+          - TTL: 60
+            Type: A
+      Name: chatting-redis
+      NamespaceId: !Ref PrivateRedisDnsNamespace
+
+  RedisService:
+    Type: AWS::ECS::Service
+    Properties:
+      ServiceName: redis-service
+      Cluster: !Ref ChattingCluster
+      DesiredCount: 1
+      LaunchType: FARGATE
+      NetworkConfiguration:
+        AwsvpcConfiguration:
+          AssignPublicIp: DISABLED
+          SecurityGroups:
+            - sg-049fc72c81717d244
+          Subnets:
+            - subnet-0179d5879df06c46a
+            - subnet-07ef708add89fd9e6
+      TaskDefinition: !Ref ChattingRedisTaskDefinition
+      ServiceRegistries:
+        - RegistryArn: !GetAtt RedisDiscoveryService.Arn
