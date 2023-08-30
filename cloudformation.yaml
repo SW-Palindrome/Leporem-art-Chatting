@@ -149,3 +149,14 @@ Resources:
       TaskDefinition: !Ref ChattingRedisTaskDefinition
       ServiceRegistries:
         - RegistryArn: !GetAtt RedisDiscoveryService.Arn
+
+  ChattingDNS:
+    Type: AWS::Route53::RecordSet
+    Properties:
+      HostedZoneId: Z10300212LTFQ7TM21IB0
+      Name: chatting.leporem.art
+      Type: CNAME
+      TTL: '300'
+      ResourceRecords:
+        - !GetAtt ChattingLoadBalancer.DNSName
+    DependsOn: ChattingLoadBalancer
