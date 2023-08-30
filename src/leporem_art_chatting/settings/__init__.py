@@ -8,3 +8,4 @@ elif os.getenv('ENV') == 'prod':
 LOGIN_URL = BASE_API_URL + '/users/info/my'
 MESSAGE_UPLOAD_URL = BASE_API_URL + '/chats/messages'
 CHATROOM_CREATE_BY_BUYER_URL = BASE_API_URL + '/chats/buyer'
+REDIS_URL = os.getenv('REDIS_URL')

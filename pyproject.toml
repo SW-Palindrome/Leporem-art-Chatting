@@ -12,6 +12,8 @@ python-socketio = "^5.8.0"
 uvicorn = "^0.23.1"
 websockets = "^11.0.3"
 requests = "^2.31.0"
+aioredis = "^2.0.1"
+redis = "^5.0.0"
 
 [tool.poetry.scripts]
 run-server = 'leporem_art_chatting.server:run_server'
