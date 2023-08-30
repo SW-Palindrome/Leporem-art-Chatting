@@ -1,0 +1,199 @@
+AWSTemplateFormatVersion: 2010-09-09
+Resources:
+  DevCluster:
+    Type: AWS::ECS::Cluster
+    Properties:
+      ClusterName: DevApp
+
+  ChattingTaskDefinition:
+    Type: AWS::ECS::TaskDefinition
+    Properties:
+      ContainerDefinitions:
+        - Name: ChattingTaskDev
+          Essential: true
+          Image: 022129665671.dkr.ecr.ap-northeast-2.amazonaws.com/leporem-art-socket
+          PortMappings:
+            - ContainerPort: 80
+              HostPort: 80
+          LogConfiguration:
+            LogDriver: awslogs
+            Options:
+              awslogs-group: /ecs/chatting-task-dev
+              awslogs-region: ap-northeast-2
+              awslogs-stream-prefix: ecs
+          Environment:
+            - Name: ENV
+              Value: dev
+            - Name: REDIS_URL
+              Value: redis://chatting-redis.leporem-art.dev:6379
+      ExecutionRoleArn: arn:aws:iam::022129665671:role/ecsTaskExecutionRole
+      RequiresCompatibilities:
+        - FARGATE
+      RuntimePlatform:
+        CpuArchitecture: ARM64
+      NetworkMode: awsvpc
+      Cpu: '512'
+      Memory: '1024'
+
+  ChattingRedisTaskDefinition:
+    Type: AWS::ECS::TaskDefinition
+    Properties:
+      ContainerDefinitions:
+        - Name: RedisTaskDev
+          Essential: true
+          Image: redis:7.2.0
+          PortMappings:
+            - ContainerPort: 6379
+              HostPort: 6379
+          LogConfiguration:
+            LogDriver: awslogs
+            Options:
+              awslogs-group: /ecs/chatting-redis-dev
+              awslogs-region: ap-northeast-2
+              awslogs-stream-prefix: ecs
+      ExecutionRoleArn: arn:aws:iam::022129665671:role/ecsTaskExecutionRole
+      RequiresCompatibilities:
+        - FARGATE
+      NetworkMode: awsvpc
+      Cpu: '512'
+      Memory: '1024'
+
+  SwaggerTaskDefinition:
+    Type: AWS::ECS::TaskDefinition
+    Properties:
+      ContainerDefinitions:
+        - Name: SwaggerTask
+          Essential: true
+          Image: swaggerapi/swagger-ui:v5.4.2
+          PortMappings:
+            - ContainerPort: 8080
+              HostPort: 8080
+          Environment:
+            - Name: SWAGGER_JSON_URL
+              Value: https://leporem-art-media-dev.s3.ap-northeast-2.amazonaws.com/swagger.yaml
+      ExecutionRoleArn: arn:aws:iam::022129665671:role/ecsTaskExecutionRole
+      RequiresCompatibilities:
+        - FARGATE
+      NetworkMode: awsvpc
+      Cpu: '512'
+      Memory: '1024'
+
+  ChattingLoadBalancer:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties:
+      Type: application
+      Name: alb-chatting-server-dev
+      SecurityGroups:
+        - sg-0cb0dd5e30baec000
+      Subnets:
+        - subnet-035df05ef63fc1027
+        - subnet-0bdae204e69666160
+
+  ChattingTargetGroup:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      HealthCheckPath: /
+      Name: tg-chatting-server-dev
+      Port: 80
+      Protocol: HTTP
+      TargetType: ip
+      VpcId: vpc-060aae09116cec874
+
+  ChattingListener:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Properties:
+      DefaultActions:
+        - Type: forward
+          TargetGroupArn: !Ref ChattingTargetGroup
+      LoadBalancerArn: !Ref ChattingLoadBalancer
+      Port: 80
+      Protocol: HTTP
+
+  ChattingService:
+    Type: AWS::ECS::Service
+    Properties:
+      ServiceName: chatting-service
+      Cluster: !Ref DevCluster
+      DesiredCount: 2
+      LaunchType: FARGATE
+      NetworkConfiguration:
+        AwsvpcConfiguration:
+          AssignPublicIp: ENABLED
+          SecurityGroups:
+            - sg-0cb0dd5e30baec000
+          Subnets:
+            - subnet-035df05ef63fc1027
+            - subnet-0bdae204e69666160
+      TaskDefinition: !Ref ChattingTaskDefinition
+      LoadBalancers:
+        - TargetGroupArn: !Ref ChattingTargetGroup
+          ContainerPort: 80
+          ContainerName: ChattingTaskDev
+    DependsOn:
+      - ChattingListener
+      - RedisService
+
+  PrivateRedisDnsNamespace:
+    Type: AWS::ServiceDiscovery::PrivateDnsNamespace
+    Properties:
+      Name: leporem-art.dev
+      Vpc: vpc-060aae09116cec874
+
+  RedisDiscoveryService:
+    Type: AWS::ServiceDiscovery::Service
+    Properties:
+      Description: Redis Discovery Service
+      DnsConfig:
+        RoutingPolicy: MULTIVALUE
+        DnsRecords:
+          - TTL: 60
+            Type: A
+      Name: chatting-redis
+      NamespaceId: !Ref PrivateRedisDnsNamespace
+
+  RedisService:
+    Type: AWS::ECS::Service
+    Properties:
+      ServiceName: redis-service
+      Cluster: !Ref DevCluster
+      DesiredCount: 1
+      LaunchType: FARGATE
+      NetworkConfiguration:
+        AwsvpcConfiguration:
+          AssignPublicIp: DISABLED
+          SecurityGroups:
+            - sg-049fc72c81717d244
+          Subnets:
+            - subnet-0179d5879df06c46a
+            - subnet-07ef708add89fd9e6
+      TaskDefinition: !Ref ChattingRedisTaskDefinition
+      ServiceRegistries:
+        - RegistryArn: !GetAtt RedisDiscoveryService.Arn
+
+  SwaggerService:
+    Type: AWS::ECS::Service
+    Properties:
+      ServiceName: swagger-service
+      Cluster: !Ref DevCluster
+      DesiredCount: 1
+      LaunchType: FARGATE
+      NetworkConfiguration:
+        AwsvpcConfiguration:
+          AssignPublicIp: ENABLED
+          SecurityGroups:
+            - sg-0cb0dd5e30baec000
+          Subnets:
+            - subnet-035df05ef63fc1027
+            - subnet-0bdae204e69666160
+      TaskDefinition: !Ref SwaggerTaskDefinition
+
+  ChattingDNS:
+    Type: AWS::Route53::RecordSet
+    Properties:
+      HostedZoneId: Z10300212LTFQ7TM21IB0
+      Name: chatting-dev.leporem.art
+      Type: CNAME
+      TTL: '300'
+      ResourceRecords:
+        - !GetAtt ChattingLoadBalancer.DNSName
+    DependsOn: ChattingLoadBalancer
