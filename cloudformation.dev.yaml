@@ -68,6 +68,12 @@ Resources:
           PortMappings:
             - ContainerPort: 8080
               HostPort: 8080
+          LogConfiguration:
+            LogDriver: awslogs
+            Options:
+              awslogs-group: /ecs/swagger
+              awslogs-region: ap-northeast-2
+              awslogs-stream-prefix: ecs
           Environment:
             - Name: SWAGGER_JSON_URL
               Value: https://leporem-art-media-dev.s3.ap-northeast-2.amazonaws.com/swagger.yaml
