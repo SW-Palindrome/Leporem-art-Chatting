@@ -32,8 +32,8 @@ Resources:
       RuntimePlatform:
         CpuArchitecture: ARM64
       NetworkMode: awsvpc
-      Cpu: '512'
-      Memory: '1024'
+      Cpu: '256'
+      Memory: '512'
 
   ChattingRedisTaskDefinition:
     Type: AWS::ECS::TaskDefinition
@@ -55,8 +55,8 @@ Resources:
       RequiresCompatibilities:
         - FARGATE
       NetworkMode: awsvpc
-      Cpu: '512'
-      Memory: '1024'
+      Cpu: '256'
+      Memory: '512'
 
   SwaggerTaskDefinition:
     Type: AWS::ECS::TaskDefinition
@@ -120,7 +120,7 @@ Resources:
     Properties:
       ServiceName: chatting-service
       Cluster: !Ref DevCluster
-      DesiredCount: 2
+      DesiredCount: 1
       LaunchType: FARGATE
       NetworkConfiguration:
         AwsvpcConfiguration:
