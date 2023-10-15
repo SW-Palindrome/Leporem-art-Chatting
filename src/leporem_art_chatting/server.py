@@ -45,8 +45,11 @@ async def _validate_session_login(sid):
 
 @sio.event
 async def send_message(sid, data):
+    print(f'send_data {sid}')
     await _validate_session_login(sid)
+    print(f'send_data validated {sid}: {data}')
     await _migrate_message(sid, data)
+    print(f'send_data migrated {sid}: {data}')
 
 
 async def _migrate_message(sid, data):
