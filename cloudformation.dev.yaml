@@ -64,7 +64,6 @@ Resources:
     Properties:
       ServiceName: chatting-service
       Cluster: !Ref DevCluster
-      DesiredCount: 1
       LaunchType: FARGATE
       NetworkConfiguration:
         AwsvpcConfiguration:
@@ -74,6 +73,7 @@ Resources:
           Subnets:
             - subnet-035df05ef63fc1027
             - subnet-0bdae204e69666160
+      TaskDefinition: !Ref ChattingTaskDefinition
 
   SwaggerService:
     Type: AWS::ECS::Service
