@@ -4,12 +4,11 @@ import logging
 import requests
 import socketio
 
-from leporem_art_chatting.settings import LOGIN_URL, MESSAGE_UPLOAD_URL, CHATROOM_CREATE_BY_BUYER_URL, REDIS_URL
+from leporem_art_chatting.settings import LOGIN_URL, MESSAGE_UPLOAD_URL, CHATROOM_CREATE_BY_BUYER_URL
 
 
 logger = logging.getLogger(__name__)
-mgr = socketio.AsyncRedisManager(REDIS_URL)
-sio = socketio.AsyncServer(async_mode='asgi', client_manager=mgr)
+sio = socketio.AsyncServer(async_mode='asgi')
 app = socketio.ASGIApp(sio, static_files={
     '/': './public/index.html',
 })
