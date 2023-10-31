@@ -74,13 +74,6 @@ Resources:
           Subnets:
             - subnet-035df05ef63fc1027
             - subnet-0bdae204e69666160
-      TaskDefinition: !Ref ChattingTaskDefinition
-      LoadBalancers:
-        - TargetGroupArn: !Ref ChattingTargetGroup
-          ContainerPort: 80
-          ContainerName: ChattingTaskDev
-    DependsOn:
-      - ChattingListener
 
   SwaggerService:
     Type: AWS::ECS::Service
